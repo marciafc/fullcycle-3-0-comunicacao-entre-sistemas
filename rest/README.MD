@@ -26,23 +26,31 @@
     - 3 - HATEOAS (Hypermedia as the Engine of Application State)
 	
 	  - links com os próximos passos
+	  
 	  - API autoexplicável
 	  
 ## Aula 2 - Method e Content Negotiation
 
   - URIs únicas
   
-  - operações para recursos, inclusive caching
+  - Operações para recursos, inclusive caching
   
-  - links relacionais para recursos exemplificando o que pode ser realizado
+  - Links relacionais para recursos exemplificando o que pode ser realizado
   
   - HAL, Collection+JSON e Siren
   
     - HAL: Hypermedia Application Language -> dados + dados complementares + links de como chegar nos recursos complementares
+	
+	  - [Hypertext Application Language (HAL)](https://apigility.org/documentation/api-primer/halprimer)
+	    - fala também sobre first. prev, etc..
+		
 	  - Media type = application/hal+json
+	  
 	  - Traz o ```_links.self.href ``` com o link para o recurso atual
+	  
 	  - Traz o ```_embedded``` com a ligação de relacionamento
-	  - API fica mais rica
+	  
+	  - API fica mais rica: dados do recurso, os dados complementares e os links de como chegar aos recursos complementares
 	
   - Method Negotiation
   
@@ -62,10 +70,7 @@
 	
 	```
 	
-  - Content Negotiation	-> vai nos headers da requisição
-  
-    - Accept
-	- Content-Type
+  - Content Negotiation	-> vai nos headers da requisição -> Accept e Content-Type
   
     - **Accept** - Pedindo para devolver em um formato específico, no caso, um JSON 
 	
@@ -198,7 +203,9 @@ Desta forma, através do multi-stage build do Docker, pegamos uma imagem do Comp
   - http://localhost:8080
   
   - Criar API 'Project'
+  
   - Definir adapter do database como Driver= PDO_Sqlite e Database=test.sqlite
+  
   - Criar service com 'DB Connected' (já descobre as tabelas do banco e cria os endpoints)
   
   - IMPORTANTE: Content Negociation pode conter no header além do media type ```application/hal+json``` o media type com a versão da api: ```application/vnd.nome-da-api.v1+json```
@@ -211,7 +218,3 @@ Desta forma, através do multi-stage build do Docker, pegamos uma imagem do Comp
 
   - Temos os endpoints sem codar nada! Exemplos: GET http://localhost:8080/users, POST http://localhost:8080/users
   
-
-
-	
-	
