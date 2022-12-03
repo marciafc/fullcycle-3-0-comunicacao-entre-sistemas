@@ -60,4 +60,7 @@
 	
 	- Client evans
 	
+	- [Projeto desenvolvido de server gRPC em Go](https://github.com/marciafc/grpc-go/tree/main)
+	- [Projeto desenvolvido de server gRPC em Go - full, com código autogerado](https://github.com/marciafc/grpc-go/tree/full)
+	
 	
