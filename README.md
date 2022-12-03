@@ -42,4 +42,22 @@
 	
 	- Proto file
 	
+	- Formatos de comunicação  
+	
+	- REST vs gRPC
+	
+	- Preparar ambiente de desenvolvimento
+	
+	- Setup do projeto
+	
+	- Criar protofile
+	
+	- Gerar arquivos de código com protoc
+	
+	- Criação dos serviços
+	
+	- Criar servidor gRPC
+	
+	- Client evans
+	
 	

@@ -300,8 +300,10 @@ sqlite> create table categories (id string, name string, description string);
 pb.CategoryService@127.0.0.1:50051> service CategoryService
 
 pb.CategoryService@127.0.0.1:50051> call CreateCategory
+
 name (TYPE_STRING) => Cat 1
 description (TYPE_STRING) => Cat 1 Desc
+
 {
   "description": "Cat 1 Desc",
   "id": "6ff08c03-ce38-4bb5-9d3d-fecbcf2e5ba5",
@@ -309,8 +311,10 @@ description (TYPE_STRING) => Cat 1 Desc
 }
 
 pb.CategoryService@127.0.0.1:50051> call CreateCategory
+
 name (TYPE_STRING) => Cat 2
 description (TYPE_STRING) => Cat 2 Desc
+
 {
   "description": "Cat 2 Desc",
   "id": "9e5c90b1-0737-48b5-b31c-62a5794b7be9",
@@ -330,6 +334,8 @@ description (TYPE_STRING) => Cat 2 Desc
   - Gerar código
   
     - ```$ protoc --go_out=. --go-grpc_out=. proto/course_category.proto ```
+	
+  - Continua na Aula 16	
 
 ## Aula 16 - Listando categories
 
@@ -348,6 +354,7 @@ description (TYPE_STRING) => Cat 2 Desc
 	
 		```				
 		pb.CategoryService@127.0.0.1:50051> call ListCategories
+		
 		{
 		  "categories": [
 			{
@@ -367,8 +374,150 @@ description (TYPE_STRING) => Cat 2 Desc
 		
 ## Aula 17 - Buscando uma categoria
 
-  - Buscar uma categoria em específico
+  - Buscar uma categoria por id
   
+    - CategoryGetRequest em 'course_category.proto'
   
+    - rpc GetCategory(CategoryGetRequest) returns (Category) {} em 'course_category.proto'
 	
+    - ```$ protoc --go_out=. --go-grpc_out=. proto/course_category.proto ```
+	
+	- database/category.go -> ``` func (c *Category) Find(id string) (Category, error) ```
+	
+	- service/category.go
+	  - ``` func (c *CategoryService) GetCategory(ctx context.Context, in *pb.CategoryGetRequest) (*pb.Category, error) ```
+  
+    - Rodar aplicação -> ``` $ go run cmd/grpcServer/main.go ```  
+	
+	- Abrir aba evans -> ``` $ evans -r repl ```
+	
+	- Chamar serviço para buscar categoria por id
+	
+		```		  
+		pb.CategoryService@127.0.0.1:50051> call GetCategory
+		
+		id (TYPE_STRING) => 9e5c90b1-0737-48b5-b31c-62a5794b7be9
+		
+		{
+		  "description": "Cat 2 Desc",
+		  "id": "9e5c90b1-0737-48b5-b31c-62a5794b7be9",
+		  "name": "Cat 2"
+		}  
+		```		  
+	
+## Aula 18 - Trabalhando com stream	
 
+  - Enviar várias categorias, canal se mantém aberto, vai criando, qdo terminar, envia o resultado tudo de uma vez
+  
+    - rpc CreateCategoryStream(stream CreateCategoryRequest) returns (CategoryList) {} em 'course_category.proto'
+	
+    - ```$ protoc --go_out=. --go-grpc_out=. proto/course_category.proto ```
+	
+	- service/category.go  
+	
+	  - Vai enviando as categorias, vai criando, quando chega no final (io.EOF), sai e envia finalmente todos os dados e fecha conexão
+	  
+	  - ``` func (c *CategoryService) CreateCategoryStream(stream pb.CategoryService_CreateCategoryStreamServer) error ```´
+	  
+	    - stream.Recv()
+		
+		- stream.SendAndClose(categories)
+		
+		- append em tudo para retornar tudo de uma vez só
+
+    - Rodar aplicação -> ``` $ go run cmd/grpcServer/main.go ```  
+	
+	- Abrir aba evans -> ``` $ evans -r repl ```	
+	
+	- Chamar serviço que cria categoria por stream
+
+		```
+		pb.CategoryService@127.0.0.1:50051> call CreateCategoryStream
+
+		name (TYPE_STRING) => Cat stream 1
+		description (TYPE_STRING) => Desc 1
+
+		name (TYPE_STRING) => Cat stream 2
+		description (TYPE_STRING) => Desc 2
+
+		name (TYPE_STRING) => Cat stream 3
+		description (TYPE_STRING) => Desc 3
+
+		name (TYPE_STRING) => <digitar control D para sair>
+
+		{
+		  "categories": [
+			{
+			  "description": "Desc 1",
+			  "id": "6d1a3355-cb37-42c4-b3b5-476af93ac8da",
+			  "name": "Cat stream 1"
+			},
+			{
+			  "description": "Desc 2",
+			  "id": "5d214c1a-44de-473a-bcde-d8f06b78e2f9",
+			  "name": "Cat stream 2"
+			},
+			{
+			  "description": "Desc 3",
+			  "id": "c5cff5b9-9b17-447a-8322-d8d1d5cab659",
+			  "name": "Cat stream 3"
+			}
+		  ]
+		}	
+		```  
+		
+## Aula 19 - Trabalhando com streams bidirecionais		
+
+  - stream bidirecional: vai enviando os dados e vai recebendo a informação em seguida
+  
+    - rpc CreateCategoryStreamBidirectional(stream CreateCategoryRequest) returns (stream Category) {} em 'course_category.proto'
+	
+    - ```$ protoc --go_out=. --go-grpc_out=. proto/course_category.proto ```	
+
+	- service/category.go  
+	
+	  - ``` func (c *CategoryService) CreateCategoryStreamBidirectional(stream pb.CategoryService_CreateCategoryStreamBidirectionalServer) error ```
+	  
+	    - stream.Recv()
+		
+		- stream.Send(category)		
+
+    - Rodar aplicação -> ``` $ go run cmd/grpcServer/main.go ```  
+	
+	- Abrir aba evans -> ``` $ evans -r repl ```	
+	
+	- Chamar serviço que cria categoria por stream
+
+		```
+		pb.CategoryService@127.0.0.1:50051> call CreateCategoryStreamBidirectional
+		
+		name (TYPE_STRING) => Cat 1 bi
+		description (TYPE_STRING) => cat 1
+		
+		name (TYPE_STRING) => {
+		  "description": "cat 1",
+		  "id": "b09d96b6-565c-44a7-98b3-a9b4f506dc4f",
+		  "name": "Cat 1 bi"
+		}
+		
+		name (TYPE_STRING) => Cat 2 bi
+		description (TYPE_STRING) => Cat 2
+		
+		name (TYPE_STRING) => {
+		  "description": "Cat 2",
+		  "id": "6d1728bf-d714-429f-a2b5-d96f6f7cf2c9",
+		  "name": "Cat 2 bi"
+		}
+		
+		name (TYPE_STRING) => Cat 3 bi
+		description (TYPE_STRING) => Cat 3
+		
+		name (TYPE_STRING) => {
+		  "description": "Cat 3",
+		  "id": "115c600b-b534-48e9-9671-1fdf7f537631",
+		  "name": "Cat 3 bi"
+		}
+		
+		name (TYPE_STRING) => <digitar CONTROL D para sair>
+		
+		```
