@@ -199,28 +199,56 @@ query queryCourses {
   
   - Implementar no 'schema.resolvers.go' o método Courses que é resolver de category -> categoryResolver
   
+  - Subir a app ```$ go run cmd/server/server.go```
   
+  - Chamada para listar as categorias com os respectivos cursos
+
+```  
+query queryCategoriesWithCourses {
+  categories {
+    id
+    name    
+    description
+    courses {
+      id
+      name      
+      description
+    }
+  }
+}
+
+```
+
+  - commit hash c915006ccb0c10638dc1ff7830450f46419d5fbd
 
 ## Aula 13 - Finalizando encadeamento de categorias
 
   - model\course.go -> remover referência para Category
 
-  - Executar o generate novamente
-  
-```
-$ go run github.com/99designs/gqlgen generate
-```
+  - Executar o generate novamente ```$ go run github.com/99designs/gqlgen generate```
 
   - Implmentar no 'schema.resolvers.go' o método Category que é resolver de course -> courseResolver
-  
-```  
-func (r *courseResolver) Category(ctx context.Context, obj *model.Course) (*model.Category, error)
-```
 
   - internal/database/category.go  
+  
+  - Subir a app ```$ go run cmd/server/server.go```
+  
+  - Chamada para listar os cursos com a respectiva categoria
+
 ```  
-func (c *Category) FindByCourseID(courseID string) (Category, error) 
-```
+query queryCoursesWithCategory {
+  courses {
+    id 
+    name
+    category{
+      id
+      name      
+      description            
+    }
+  }
+}
+```   
+  - commit hash 47ef13eb602819a7661d0aacf2aef58af32206db
 
 ## Aula 14 
 
