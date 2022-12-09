@@ -138,52 +138,51 @@ query queryCategories {
 ## Aula 9 - Implementando CourseDB
 
   - internal/database/course.go
+  
+  - commit hash deef20d33295e4173c81710ce102c31e169c1d1d
 
 ## Aula 10 - Criando resolver de CreateCourse
 
-  - schema.resolvers.go
-  
-```
-func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error)
-```
   - Injetar a dependência da CourseDB no Resolver em **resolver.go**
   
-```  
-type Resolver struct{
-	CategoryDB *database.Category	
-	CourseDB *database.Course
-}
-```  
-
+  - schema.resolvers.go    
+  
   - server.go
-```  
-courseDb := database.NewCourse(db)
+  
+  - Subir a app ```$ go run cmd/server/server.go```
+  
+  - Chamada para inserir course:
 
-// ...
+```
+mutation createCourse {
+  createCourse(input: {name: "Full Cyclle", description: "The best", categoryId: "d3e21990-5430-4550-8c38-3a81630d3b53"}) {
+   id
+   name
+  }
+}  
+```
 
-// Injetar no resolver de CourseDB
-srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		CategoryDB: categoryDb,
-		CourseDB:   courseDb,
-	}}))
-
-
-```  
-
-- Criar tabela de courses
-
-```  
-sqlite> create table courses (id string, name string, description string, category_id string);
-```  
+  - commit hash c31d70c4566733723acfc5fb84773d976d2bbb2e
 
 ## Aula 11 - Implementando QueryCourses
 
   - schema.resolvers.go
   
-```
-func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]*model.Course, error) 
-```
+  - Subir a app ```$ go run cmd/server/server.go```
+  
+  - Chamada para listar courses:
 
+```
+query queryCourses {
+  courses {
+    id 
+    name
+  }
+}
+```  
+  
+  - commit hash 75ce818f415c182240796910b92f6884c687abe5
+  
 ## Aula 12 - Dados encadeados
 
   - Nested informations
@@ -193,32 +192,14 @@ func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]
     - ```type Category struct``` PARA graph/model/category.go
   
   - Organizar no gqlgen.yml os model
-  
-```
-models:
-  Category:
-    model:
-      - github.com/marciafc/graphql/graph/model.Category
-  Course:
-    model:
-      - github.com/marciafc/graphql/graph/graph/model.Course
-```
 
-  - Executar o generate novamente
+  - Executar o generate novamente: ```$ go run github.com/99designs/gqlgen generate```
   
-```
-$ go run github.com/99designs/gqlgen generate
-```
-  - Implmentar no 'schema.resolvers.go' o método Courses que é resolver de category -> categoryResolver
-  
-```  
-func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]*model.Course, error)
-```
-
   - internal/database/course.go  
-```  
-func (c *Course) FindByCategoryID(categoryID string) ([]Course, error)   
-``` 
+  
+  - Implementar no 'schema.resolvers.go' o método Courses que é resolver de category -> categoryResolver
+  
+  
 
 ## Aula 13 - Finalizando encadeamento de categorias
 
