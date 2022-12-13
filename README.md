@@ -72,4 +72,5 @@
 	- mutation
 	- resolvers
 	- query
-	
+
+  - [Service discovery e Consul](service-discovery-e-consul/README.MD)
